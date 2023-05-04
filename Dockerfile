@@ -4,6 +4,11 @@ RUN docker-php-ext-install pdo_mysql
 RUN docker-php-ext-install pcntl
 RUN docker-php-ext-install posix
 
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+
 COPY . /usr/src/myapp
 WORKDIR /usr/src/myapp
-CMD [ "php", "./index.php" ]
+
+RUN composer install
+
+CMD ["php", "./index.php"]
