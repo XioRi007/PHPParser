@@ -7,7 +7,6 @@ require_once 'vendor/autoload.php';
 use Core\App;
 use Core\Database\MyDB;
 use Core\Main;
-use Core\Parser\Tasks\Types;
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -37,8 +36,8 @@ try {
     //$proxy->reloadProxies();
 
     //first tasks with pages to parse
-    $queue->sendMessage('https://www.kreuzwort-raetsel.net/uebersicht-zeichen.html', ['type'=>Types::ANSWER_SYMBOLS->name]);
-    $queue->sendMessage('https://www.kreuzwort-raetsel.net/uebersicht.html', ['type'=>Types::QUESTION_LETTERS->name]);
+    $queue->sendMessage('https://www.kreuzwort-raetsel.net/uebersicht-zeichen.html', ['type'=>'\Core\Parser\Tasks\Answer\AnswerSymbolsTask']);
+    $queue->sendMessage('https://www.kreuzwort-raetsel.net/uebersicht.html', ['type'=>'\Core\Parser\Tasks\Question\QuestionLettersTask']);
 
     $threadsCount = intval($_ENV['THREADS']);
 
@@ -99,7 +98,7 @@ try {
     }
     $logger->critical('Parsing is finished');
 
-} catch (Exception $exc) {
+} catch (Throwable $exc) {
     $logger->critical($exc->getMessage());
     $logger->critical('Parsing is stopped due to the error');
 }

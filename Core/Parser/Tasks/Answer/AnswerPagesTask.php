@@ -4,7 +4,6 @@ namespace Core\Parser\Tasks\Answer;
 
 use Core\Models\Task;
 use Core\Parser\Tasks\BaseTask;
-use Core\Parser\Tasks\Types;
 
 class AnswerPagesTask extends BaseTask
 {
@@ -15,7 +14,7 @@ class AnswerPagesTask extends BaseTask
         $hrefs = $this->extractHrefFromList($links, $task->id);
         $this->logger->debug("AnswerPagesTask found " . count($hrefs) . " hrefs");
         foreach ($hrefs as $link) {
-            $this->queue->sendMessage($link, ['type'=>Types::ANSWER_LIST->name]);
+            $this->queue->sendMessage($link, ['type'=>'\Core\Parser\Tasks\Answer\AnswerListTask']);
         }
     }
 }

@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Core;
 
 use Core\Database\MyDB;
-use Core\Parser\TaskFactory;
 use Core\Queue\Exceptions\NoMessageException;
 use Core\Queue\IQueue;
-use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Monolog\Logger;
+use Throwable;
 
 class Main
 {
@@ -61,14 +60,17 @@ class Main
             try {
                 $taskObj = $this->queue->receiveMessage();
                 $this->logger->info('Task received');
-                $taskFactory = new TaskFactory();
-                $task = $taskFactory->createTask($taskObj->data->type);
+                $class = $taskObj->data->type;
+                $task = new $class();
                 $task->process($taskObj);
+//                $taskFactory = new TaskFactory();
+//                $task = $taskFactory->createTask($taskObj->data->type);
+//                $task->process($taskObj);
                 $this->queue->deleteMessage($taskObj->id);
                 $this->logger->info('Task deleted');
             } catch (NoMessageException) {
-
-            } catch (Exception $exc) {
+                sleep(10);
+            } catch (Throwable  $exc) {
                 $this->logger->error($exc->getMessage());
                 if ($taskObj !== null) {
                     if ($taskObj->tries > 3) {
@@ -76,6 +78,8 @@ class Main
                     } else {
                         $taskObj->increment('tries', 1, ['status' => 'error']);
                     }
+                }else{
+                    throw $exc;
                 }
             }
             sleep($this->sleepSec);
