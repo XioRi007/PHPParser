@@ -1,0 +1,28 @@
+{
+    "name": "barnash/parser",
+    "description": "Php parser",
+    "type": "app",
+    "minimum-stability": "dev",
+    "require": {
+        "guzzlehttp/guzzle": "dev-master",
+        "illuminate/database": "^11.0@dev",
+        "vlucas/phpdotenv": "^5.5@dev",
+        "illuminate/support": "^11.0@dev",
+        "monolog/monolog": "^3.0@dev",
+        "campo/random-user-agent": "dev-master",
+        "imangazaliev/didom": "dev-master",
+        "ext-pcntl": "*",
+        "ext-posix": "*"
+    },
+    "authors": [
+        {
+            "name": "Mariia Barnash",
+            "email": "maria.barnash@gmail.com"
+        }
+    ],
+    "autoload":{
+        "psr-4":{
+            "Core\\":"Core/"
+        }
+    }
+}
