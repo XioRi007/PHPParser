@@ -14,8 +14,8 @@ class AnswerSymbolsTask extends BaseTask
         $links = $this->getList($task->id);
         $hrefs = $this->extractHrefFromList($links, $task->id);
         $this->logger->debug("AnswerSymbolsTask found " . count($hrefs) . " hrefs");
-        foreach ($links as $link) {
-            $this->queue->sendMessage($link, ['type'=>Types::ANSWER_PAGES->name, 'url'=>$link]);
+        foreach ($hrefs as $link) {
+            $this->queue->sendMessage($link, ['type'=>Types::ANSWER_PAGES->name]);
         }
     }
 }

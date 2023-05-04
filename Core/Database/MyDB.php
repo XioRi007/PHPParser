@@ -63,7 +63,7 @@ class MyDB
     {
         Capsule::schema()->create(static::$answersTable, function ($table) {
             $table->id();
-            $table->text('text')->unique();
+            $table->string('text', 255)->unique();
             $table->integer('length');
         });
     }
@@ -76,7 +76,7 @@ class MyDB
     {
         Capsule::schema()->create(static::$questionsTable, function ($table) {
             $table->id();
-            $table->text('text')->unique();
+            $table->string('text', 255)->unique();
         });
     }
 

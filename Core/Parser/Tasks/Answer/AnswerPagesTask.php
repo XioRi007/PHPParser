@@ -14,8 +14,8 @@ class AnswerPagesTask extends BaseTask
         $links = $this->getList($task->id);
         $hrefs = $this->extractHrefFromList($links, $task->id);
         $this->logger->debug("AnswerPagesTask found " . count($hrefs) . " hrefs");
-        foreach ($links as $link) {
-            $this->queue->sendMessage($link, ['type'=>Types::ANSWER_LIST->name, 'url'=>$link]);
+        foreach ($hrefs as $link) {
+            $this->queue->sendMessage($link, ['type'=>Types::ANSWER_LIST->name]);
         }
     }
 }
