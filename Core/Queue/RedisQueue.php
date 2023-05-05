@@ -88,9 +88,11 @@ class RedisQueue implements IQueue
         if (!$exists || $queuedTask->data->tries < 5) {
             $source = $this->hiddenQueueName . ":" . $queuedTask->id;
             $queuedTask->data->tries = $exists ? $queuedTask->data->tries + 1 : 1;
-            $this->client->set($source, json_encode($queuedTask->data));
             $dest = $this->queueName . ":" . $queuedTask->id;
-            $this->client->rpoplpush($source, $dest);
+            $this->client->transaction(function ($tx) use ($source, $dest, $queuedTask) {
+                $this->client->del($source);
+                $this->client->lpush($dest, [json_encode($queuedTask->data)]);
+            });
         } else {
             $this->client->del($this->hiddenQueueName . ":" . $queuedTask->id);
         }

@@ -14,7 +14,7 @@ $logger = null;
 
 try {
     if (! function_exists('pcntl_fork')) {
-        throw new Exception('PCNTL functions not available on this PHP installation');
+        die('PCNTL functions not available on this PHP installation');
     }
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->load();
