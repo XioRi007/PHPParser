@@ -7,7 +7,6 @@ namespace Core;
 use Core\Database\MyDB;
 use Core\Queue\Exceptions\NoMessageException;
 use Core\Queue\IQueue;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Monolog\Logger;
 use Throwable;
@@ -30,7 +29,7 @@ class Main
     private int $sleepSec;
 
     /**
-     * @throws BindingResolutionException
+     * @throws  BindingResolutionException
      */
     public function __construct()
     {
@@ -50,34 +49,28 @@ class Main
      * If the task has already been tried 5 times, the status is set to "finished_with_error".
      * Otherwise, the status is set to "error" and the number of tries is incremented by one.
      * @return  void
-     * @throws  GuzzleException
+     * @throws  NoMessageException
+     * @throws  Throwable
      */
     public function start(): void
     {
         $this->logger->info('Started');
         while (!$this->queue->isEmpty()) {
-            $taskObj = null;
+            $queuedTask = null;
             try {
-                $taskObj = $this->queue->receiveMessage();
+                $queuedTask = $this->queue->receiveMessage();
                 $this->logger->info('Task received');
-                $class = $taskObj->data->type;
+                $class = $queuedTask->data->type;
                 $task = new $class();
-                $task->process($taskObj);
-//                $taskFactory = new TaskFactory();
-//                $task = $taskFactory->createTask($taskObj->data->type);
-//                $task->process($taskObj);
-                $this->queue->deleteMessage($taskObj->id);
+                $task->process($queuedTask);
+                $this->queue->deleteMessage($queuedTask->id);
                 $this->logger->info('Task deleted');
             } catch (NoMessageException) {
                 sleep(10);
             } catch (Throwable  $exc) {
                 $this->logger->error($exc->getMessage());
-                if ($taskObj !== null) {
-                    if ($taskObj->tries > 3) {
-                        $taskObj->increment('tries', 1, ['status' => 'finished_with_error']);
-                    } else {
-                        $taskObj->increment('tries', 1, ['status' => 'error']);
-                    }
+                if ($queuedTask !== null) {
+                    $this->queue->returnMessageToQueue($queuedTask);
                 }else{
                     throw $exc;
                 }

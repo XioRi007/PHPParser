@@ -3,8 +3,8 @@
 namespace Core\Parser\Tasks;
 
 use Core\App;
-use Core\Models\Task;
 use Core\Queue\IQueue;
+use Core\Queue\QueuedTask;
 use Core\Utils\ProxyRequest;
 use DiDom\Document;
 use DiDom\Exceptions\InvalidSelectorException;
@@ -42,12 +42,12 @@ abstract class BaseTask
 
     /**
      * Parses the data depending on task type
-     * @param  Task  $task
+     * @param QueuedTask $task
      * @return  void
      * @throws  GuzzleException
      * @throws  InvalidSelectorException
      */
-    abstract public function process(Task $task): void;
+    abstract public function process(QueuedTask $task): void;
 
     /**
      * Sends the ProxyRequest to get data to parse

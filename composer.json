@@ -11,6 +11,7 @@
         "monolog/monolog": "^3.0@dev",
         "campo/random-user-agent": "dev-master",
         "imangazaliev/didom": "dev-master",
+        "predis/predis": "v2.x-dev",
         "ext-pcntl": "*",
         "ext-posix": "*"
     },

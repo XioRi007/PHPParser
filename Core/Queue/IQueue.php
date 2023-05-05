@@ -2,7 +2,6 @@
 
 namespace Core\Queue;
 
-use Core\Models\Task;
 use Core\Queue\Exceptions\NoMessageException;
 
 interface IQueue
@@ -29,16 +28,23 @@ interface IQueue
 
     /**
      * Receives a message from the queue.
-     * @return  Task
+     * @return  object
      * @throws  NoMessageException
      */
-    public function receiveMessage(): Task;
+    public function receiveMessage(): object;
 
     /**
      * Returns all currently processing messages back to the queue.
      * @return  void
      */
     public function returnProcessingMessagesToQueue(): void;
+
+    /**
+     * Depending on tries count deletes it or returns to the queue.
+     * @param QueuedTask $queuedTask
+     * @return void
+     */
+    public function returnMessageToQueue(QueuedTask $queuedTask): void;
 
     /**
      * Deletes a message from the queue.

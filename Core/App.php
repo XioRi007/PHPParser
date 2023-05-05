@@ -3,7 +3,7 @@
 namespace Core;
 
 use Core\Database\MyDB;
-use Core\Queue\MysqlQueue;
+use Core\Queue\RedisQueue;
 use Core\Utils\ProxyRequest;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Facade;
@@ -49,7 +49,7 @@ class App
             return $record;
         });
 
-        $queue = new MysqlQueue('queue', $log);
+        $queue = new RedisQueue($log);
         static::$container->singleton('IQueue', function () use ($queue) {
             return $queue;
         });
@@ -63,7 +63,7 @@ class App
     }
 
     /**
-     * @return Container
+     * @return  Container
      */
     public static function getContainer(): Container
     {

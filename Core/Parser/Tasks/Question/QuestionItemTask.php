@@ -4,15 +4,15 @@ namespace Core\Parser\Tasks\Question;
 
 use Core\Models\Answer;
 use Core\Models\Question;
-use Core\Models\Task;
 use Core\Parser\Tasks\BaseTask;
+use Core\Queue\QueuedTask;
 
 class QuestionItemTask extends BaseTask
 {
-    public function process(Task $task): void
+    public function process(QueuedTask $task): void
     {
-        $this->logger->info("started QuestionItemTask for $task->id");
-        $document = $this->getDocument($task->id);
+        $this->logger->info("started QuestionItemTask for {$task->data->url}");
+        $document = $this->getDocument($task->data->url);
 
         $questionText = $document->first('#HeaderString')->text();
         $question = new Question();

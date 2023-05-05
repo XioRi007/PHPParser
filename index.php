@@ -36,8 +36,8 @@ try {
     //$proxy->reloadProxies();
 
     //first tasks with pages to parse
-    $queue->sendMessage('https://www.kreuzwort-raetsel.net/uebersicht-zeichen.html', ['type'=>'\Core\Parser\Tasks\Answer\AnswerSymbolsTask']);
-    $queue->sendMessage('https://www.kreuzwort-raetsel.net/uebersicht.html', ['type'=>'\Core\Parser\Tasks\Question\QuestionLettersTask']);
+    $queue->sendMessage('https://www.kreuzwort-raetsel.net/uebersicht-zeichen.html', ['type'=>'\Core\Parser\Tasks\Answer\AnswerSymbolsTask', 'url'=>'https://www.kreuzwort-raetsel.net/uebersicht-zeichen.html']);
+    $queue->sendMessage('https://www.kreuzwort-raetsel.net/uebersicht.html', ['type'=>'\Core\Parser\Tasks\Question\QuestionLettersTask', 'url'=>'https://www.kreuzwort-raetsel.net/uebersicht.html']);
 
     $threadsCount = intval($_ENV['THREADS']);
 
