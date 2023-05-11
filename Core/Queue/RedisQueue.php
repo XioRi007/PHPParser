@@ -33,7 +33,7 @@ class RedisQueue implements IQueue
 
     public function createIfNotExists(): void
     {
-
+        //
     }
 
     public function reMigrate(): void
@@ -56,33 +56,26 @@ class RedisQueue implements IQueue
 
     public function receiveMessage(): QueuedTask
     {
-        $key = "";
-	$cnt = 0;
+	    $cnt = 0;
+        $clearKey = '';
+        $res = '';
         foreach (new Iterator\Keyspace($this->client, $this->queueName . ":*", 1) as $tmp) {
-            /*if($key != "") {
-                break;
-            }*/
-	if($cnt >=20) throw new NoMessageException();
+            if($cnt >= 20)
+                throw new NoMessageException();
             $key = $tmp;
-       // }
-	if($key == ""){
-		$cnt++;
-		continue;
-	}
-        $clearKey = substr($key, strrpos($key, ':') + 1);
-        $dest = $this->hiddenQueueName . ":" . $clearKey;
-        $res = $this->client->rpoplpush($key, $dest);
-/*	if(!is_string($res)){
-	    var_dump($res);
-		var_dump($key);
-	}*/
-        if($res == "" || !is_string($res)) {
-		$cnt++;
-  //          throw new NoMessageException();
-        }else {
-		break;
-	}
-	}
+            if($key == ""){
+                $cnt++;
+                continue;
+            }
+            $clearKey = substr($key, strrpos($key, ':') + 1);
+            $dest = $this->hiddenQueueName . ":" . $clearKey;
+            $res = $this->client->rpoplpush($key, $dest);
+            if($res == "" || !is_string($res)) {
+                $cnt++;
+            } else {
+                break;
+            }
+	    }
         return new QueuedTask($clearKey, json_decode($res));
     }
 
@@ -108,8 +101,7 @@ class RedisQueue implements IQueue
                 $this->client->lpush($dest, [json_encode($queuedTask->data)]);
             });
         } else {
-//            $this->client->del($this->hiddenQueueName . ":" . $queuedTask->id);
-		$this->deleteMessage($queuedTask->id);
+		    $this->deleteMessage($queuedTask->id);
         }
     }
 
@@ -117,10 +109,8 @@ class RedisQueue implements IQueue
     public function deleteMessage(string $id): void
     {
         $key = $this->hiddenQueueName . ":$id";
-	//$clearKey = substr($key, strrpos($key, ':') + 1);
         $dest = $this->queueName . "_deleted:" . $id;
-        $res = $this->client->rpoplpush($key, $dest);
-        //$this->client->del($key);
+        $this->client->rpoplpush($key, $dest);
     }
 
     public function isEmpty(): bool
