@@ -1,0 +1,20 @@
+[2023-05-08, 10:01 am] INFO: Started [] {"pid":65288}
+[2023-05-08, 10:01 am] INFO: Task received [] {"pid":65288}
+[2023-05-08, 10:01 am] INFO: started QuestionItemTask for https://www.kreuzwort-raetsel.net/frage/stadt-in-suednorwegen/ [] {"pid":65288}
+[2023-05-08, 10:01 am] INFO: Started [] {"pid":65289}
+[2023-05-08, 10:01 am] INFO: Task received [] {"pid":65289}
+[2023-05-08, 10:01 am] INFO: started QuestionItemTask for https://www.kreuzwort-raetsel.net/frage/verhalten/ [] {"pid":65289}
+[2023-05-08, 10:01 am] INFO: Started [] {"pid":65290}
+[2023-05-08, 10:01 am] INFO: Task received [] {"pid":65290}
+[2023-05-08, 10:01 am] INFO: started QuestionItemTask for https://www.kreuzwort-raetsel.net/frage/waermeanlage-im-auto/ [] {"pid":65290}
+[2023-05-08, 10:01 am] INFO: Started [] {"pid":65291}
+[2023-05-08, 10:01 am] INFO: Task received [] {"pid":65291}
+[2023-05-08, 10:01 am] INFO: started AnswerItemTask for https://www.kreuzwort-raetsel.net/antwort/aufklaffen/ [] {"pid":65291}
+[2023-05-08, 10:01 am] DEBUG: QuestionItemTask found 19 answers for Verhalten question [] {"pid":65289}
+[2023-05-08, 10:01 am] INFO: Task deleted [] {"pid":65289}
+[2023-05-08, 10:01 am] DEBUG: QuestionItemTask found 1 answers for Wärmeanlage im Auto question [] {"pid":65290}
+[2023-05-08, 10:01 am] INFO: Task deleted [] {"pid":65290}
+[2023-05-08, 10:01 am] INFO: Started [] {"pid":65293}
+[2023-05-08, 10:01 am] INFO: Task received [] {"pid":65293}
+[2023-05-08, 10:01 am] INFO: started QuestionItemTask for https://www.kreuzwort-raetsel.net/frage/grenzfluss-zwischen-russland-und-nordkorea/ [] {"pid":65293}
+[2023-05-08, 10:01 am] INFO: Started [] {"pid":65294}

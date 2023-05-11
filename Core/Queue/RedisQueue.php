@@ -46,7 +46,7 @@ class RedisQueue implements IQueue
     public function sendMessage(string $id, array $data): void
     {
         $key = "$this->queueName:".md5($id);
-        if($this->client->exists($key) || $this->client->exists("$this->hiddenQueueName:".md5($id))) {
+        if($this->client->exists($key) || $this->client->exists("$this->hiddenQueueName:".md5($id)) || $this->client->exists("{$this->queueName}_deleted:".md5($id))) {
             $this->logger->info("Message $id already exists");
             return;
         }
@@ -57,18 +57,32 @@ class RedisQueue implements IQueue
     public function receiveMessage(): QueuedTask
     {
         $key = "";
+	$cnt = 0;
         foreach (new Iterator\Keyspace($this->client, $this->queueName . ":*", 1) as $tmp) {
-            if($key != "") {
+            /*if($key != "") {
                 break;
-            }
+            }*/
+	if($cnt >=20) throw new NoMessageException();
             $key = $tmp;
-        }
+       // }
+	if($key == ""){
+		$cnt++;
+		continue;
+	}
         $clearKey = substr($key, strrpos($key, ':') + 1);
         $dest = $this->hiddenQueueName . ":" . $clearKey;
         $res = $this->client->rpoplpush($key, $dest);
-        if($res == "") {
-            throw new NoMessageException();
-        }
+/*	if(!is_string($res)){
+	    var_dump($res);
+		var_dump($key);
+	}*/
+        if($res == "" || !is_string($res)) {
+		$cnt++;
+  //          throw new NoMessageException();
+        }else {
+		break;
+	}
+	}
         return new QueuedTask($clearKey, json_decode($res));
     }
 
@@ -85,7 +99,7 @@ class RedisQueue implements IQueue
     public function returnMessageToQueue(QueuedTask $queuedTask): void
     {
         $exists = property_exists($queuedTask->data, 'tries');
-        if (!$exists || $queuedTask->data->tries < 5) {
+        if (!$exists || $queuedTask->data->tries < 10) {
             $source = $this->hiddenQueueName . ":" . $queuedTask->id;
             $queuedTask->data->tries = $exists ? $queuedTask->data->tries + 1 : 1;
             $dest = $this->queueName . ":" . $queuedTask->id;
@@ -94,7 +108,8 @@ class RedisQueue implements IQueue
                 $this->client->lpush($dest, [json_encode($queuedTask->data)]);
             });
         } else {
-            $this->client->del($this->hiddenQueueName . ":" . $queuedTask->id);
+//            $this->client->del($this->hiddenQueueName . ":" . $queuedTask->id);
+		$this->deleteMessage($queuedTask->id);
         }
     }
 
@@ -102,7 +117,10 @@ class RedisQueue implements IQueue
     public function deleteMessage(string $id): void
     {
         $key = $this->hiddenQueueName . ":$id";
-        $this->client->del($key);
+	//$clearKey = substr($key, strrpos($key, ':') + 1);
+        $dest = $this->queueName . "_deleted:" . $id;
+        $res = $this->client->rpoplpush($key, $dest);
+        //$this->client->del($key);
     }
 
     public function isEmpty(): bool

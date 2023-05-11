@@ -24,20 +24,20 @@ try {
 
     //you can choose
     //MyDB::migrate();
-    MyDB::reMigrate();
+  //  MyDB::reMigrate();
     $queue = App::getContainer()->make('IQueue');
 
     //you can choose
-    //$queue->createIfNotExists();
-    $queue->reMigrate();
+//    //$queue->createIfNotExists();
+//    $queue->reMigrate();
 
     //clear comments to reload proxy list, but it will take time
-    //$proxy = App::getContainer()->make('ProxyRequest');
-    //$proxy->reloadProxies();
+//    $proxy = App::getContainer()->make('ProxyRequest');
+//    $proxy->reloadProxies();
 
     //first tasks with pages to parse
-    $queue->sendMessage('https://www.kreuzwort-raetsel.net/uebersicht-zeichen.html', ['type'=>'\Core\Parser\Tasks\Answer\AnswerSymbolsTask', 'url'=>'https://www.kreuzwort-raetsel.net/uebersicht-zeichen.html']);
-    $queue->sendMessage('https://www.kreuzwort-raetsel.net/uebersicht.html', ['type'=>'\Core\Parser\Tasks\Question\QuestionLettersTask', 'url'=>'https://www.kreuzwort-raetsel.net/uebersicht.html']);
+//    $queue->sendMessage('https://www.kreuzwort-raetsel.net/uebersicht-zeichen.html', ['type'=>'\Core\Parser\Tasks\Answer\AnswerSymbolsTask', 'url'=>'https://www.kreuzwort-raetsel.net/uebersicht-zeichen.html']);
+  //  $queue->sendMessage('https://www.kreuzwort-raetsel.net/uebersicht.html', ['type'=>'\Core\Parser\Tasks\Question\QuestionLettersTask', 'url'=>'https://www.kreuzwort-raetsel.net/uebersicht.html']);
 
     $threadsCount = intval($_ENV['THREADS']);
 

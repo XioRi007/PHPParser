@@ -59,16 +59,22 @@ class ProxyRequest
         $client = new Client([
             'timeout' => 5.0
         ]);
-        $response = $client->request('GET', 'https://api.proxyscrape.com/v2/?request=getproxies&protocol=http&timeout=5000&country=all&ssl=all&anonymity=anonymous');
+        $response = $client->request('GET', 'https://api.proxyscrape.com/v2/?request=getproxies&protocol=http&timeout=30000&country=all&ssl=all&anonymity=anonymous');
         $list = $response->getBody()->getContents();
         $array = explode("\n", $list);
         $file = fopen($filename, "w");
+	$i = 1;
+	$len = count($array);
         foreach ($array as $item) {
             try {
                 $this->testProxy(trim($item));
                 fwrite($file, trim($item) . PHP_EOL);
                 $this->list[] = trim($item);
+		echo "$i of $len working\n";
+		$i++;
             } catch (Exception) {
+		echo "$i of $len not working\n";
+		$i++;
             }
         }
         fclose($file);
