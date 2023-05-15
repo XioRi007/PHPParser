@@ -73,8 +73,8 @@ class Main
                 $task->process($queuedTask);
                 $this->queue->deleteMessage($queuedTask->id);
                 $this->logger->info('Task deleted');
-            } catch (NoMessageException) {
-                sleep(10);
+            } catch (NoMessageException $exc) {
+                $this->logger->error($exc->getMessage());
             } catch (Throwable  $exc) {
                 $this->logger->error($exc->getMessage());
                 if ($queuedTask !== null) {

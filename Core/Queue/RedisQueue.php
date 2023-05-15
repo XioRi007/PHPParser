@@ -56,25 +56,24 @@ class RedisQueue implements IQueue
 
     public function receiveMessage(): QueuedTask
     {
-        $cnt = 0;
         $clearKey = '';
         $res = '';
         foreach (new Iterator\Keyspace($this->client, $this->queueName . ":*", 1) as $tmp) {
-            if ($cnt >= 20)
-                throw new NoMessageException();
             $key = $tmp;
             if ($key == "") {
-                $cnt++;
                 continue;
             }
             $clearKey = substr($key, strrpos($key, ':') + 1);
             $dest = $this->hiddenQueueName . ":" . $clearKey;
             $res = $this->client->rpoplpush($key, $dest);
             if ($res == "" || !is_string($res)) {
-                $cnt++;
+                continue;
             } else {
                 break;
             }
+        }
+        if($res == "" || !is_string($res)){
+            throw new NoMessageException();
         }
         return new QueuedTask($clearKey, json_decode($res));
     }
