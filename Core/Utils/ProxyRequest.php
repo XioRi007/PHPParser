@@ -24,7 +24,7 @@ class ProxyRequest
      * @param  string  $filename
      * @return   void
      */
-    public function readFromFile(string $filename): void
+    public function readFromFile(string $filename = "Core/Utils/list.txt"): void
     {
         $this->list = [];
         $file = fopen($filename, "r");

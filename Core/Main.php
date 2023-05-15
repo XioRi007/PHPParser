@@ -102,6 +102,8 @@ class Main
             $this->proxyRequest->recheckProxy();
             $this->logger->info('Starting proxy reloading');
             $this->proxyRequest->reloadProxies();
+
+            $this->proxyRequest->readFromFile();
             $this->logger->info('Finished proxy rechecking and reloading');
             sleep(300);
         }

@@ -61,12 +61,14 @@ class RedisQueue implements IQueue
         foreach (new Iterator\Keyspace($this->client, $this->queueName . ":*", 1) as $tmp) {
             $key = $tmp;
             if ($key == "") {
+                $this->logger->info("Message is empty");
                 continue;
             }
             $clearKey = substr($key, strrpos($key, ':') + 1);
             $dest = $this->hiddenQueueName . ":" . $clearKey;
             $res = $this->client->rpoplpush($key, $dest);
             if ($res == "" || !is_string($res)) {
+                $this->logger->info("Message has already been taken");
                 continue;
             } else {
                 break;
