@@ -100,9 +100,9 @@ class Main
         while (!$this->queue->isEmpty()) {
             $this->logger->info('Starting proxy rechecking');
             $this->proxyRequest->recheckProxy();
+            $this->proxyRequest->readFromFile();
             $this->logger->info('Starting proxy reloading');
             $this->proxyRequest->reloadProxies();
-
             $this->proxyRequest->readFromFile();
             $this->logger->info('Finished proxy rechecking and reloading');
             sleep(300);
