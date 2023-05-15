@@ -43,37 +43,34 @@ class RedisQueue implements IQueue
         }
     }
 
+    public function remake(){
+        foreach (new Iterator\Keyspace($this->client, $this->queueName . ":*", 1) as $tmp) {
+            $t = json_decode($this->client->get($tmp));
+            var_dump($t);
+            $this->sendMessage($t->data->url, $t->data);
+        }
+        foreach (new Iterator\Keyspace($this->client, $this->queueName . "_deleted:*", 1) as $tmp) {
+            $t = json_decode($this->client->get($tmp));
+            var_dump($t);
+            $this->deleteMessage(json_encode($t->data));
+        }
+    }
+
     public function sendMessage(string $id, array $data): void
     {
-        $key = "$this->queueName:".md5($id);
-        if($this->client->exists($key) || $this->client->exists("$this->hiddenQueueName:".md5($id)) || $this->client->exists("{$this->queueName}_deleted:".md5($id))) {
+        if($this->client->sismember($this->queueName . "_urls", $id) == 1){
             $this->logger->info("Message $id already exists");
             return;
         }
+        $this->client->sadd($this->queueName . "_urls", [$id]);
         $value = json_encode($data);
-        $this->client->lpush($key, [$value]);
+        $this->client->lpush($this->queueName, [$value]);
     }
 
     public function receiveMessage(): QueuedTask
     {
         $clearKey = '';
-        $res = '';
-        foreach (new Iterator\Keyspace($this->client, $this->queueName . ":*", 1) as $tmp) {
-            $this->logger->debug("Received message");
-            $key = $tmp;
-            if ($key == "") {
-                $this->logger->debug("Message is empty");
-                continue;
-            }
-            $clearKey = substr($key, strrpos($key, ':') + 1);
-            $dest = $this->hiddenQueueName . ":" . $clearKey;
-            $res = $this->client->rpoplpush($key, $dest);
-            if ($res == "" || !is_string($res)) {
-                $this->logger->debug("Message has already been taken");
-            } else {
-                break;
-            }
-        }
+        $res =  $this->client->rpoplpush($this->queueName, $this->hiddenQueueName);
         if($res == "" || !is_string($res)){
             throw new NoMessageException();
         }
@@ -82,11 +79,8 @@ class RedisQueue implements IQueue
 
     public function returnProcessingMessagesToQueue(): void
     {
-        foreach (new Iterator\Keyspace($this->client, $this->hiddenQueueName . ":*", 1) as $task) {
-            $clearKey = substr($task, strrpos($task, ':') + 1);
-            $source = $this->hiddenQueueName . ":" . $clearKey;
-            $dest = $this->queueName . ":" . $clearKey;
-            $this->client->rpoplpush($source, $dest);
+        while ($this->client->llen($this->hiddenQueueName) > 0) {
+            $this->client->rpoplpush($this->hiddenQueueName, $this->queueName);
         }
     }
 
@@ -94,32 +88,25 @@ class RedisQueue implements IQueue
     {
         $exists = property_exists($queuedTask->data, 'tries');
         if (!$exists || $queuedTask->data->tries < 10) {
-            $source = $this->hiddenQueueName . ":" . $queuedTask->id;
+            $this->client->lrem($this->hiddenQueueName, 1, json_encode($queuedTask->data));
             $queuedTask->data->tries = $exists ? $queuedTask->data->tries + 1 : 1;
-            $dest = $this->queueName . ":" . $queuedTask->id;
-            $this->client->transaction(function ($tx) use ($source, $dest, $queuedTask) {
-                $this->client->del($source);
-                $this->client->lpush($dest, [json_encode($queuedTask->data)]);
-            });
+            $this->client->lpush($this->queueName, [json_encode($queuedTask->data)]);
         } else {
-            $this->deleteMessage($queuedTask->id);
+            $this->deleteMessage(json_encode($queuedTask->data));
         }
     }
 
 
     public function deleteMessage(string $id): void
     {
-        $key = $this->hiddenQueueName . ":$id";
-        $dest = $this->queueName . "_deleted:" . $id;
-        $this->client->rpoplpush($key, $dest);
+        $this->client->lrem($this->hiddenQueueName, 1, $id);
+        $this->client->lpush($this->queueName . "_deleted", [$id]);
     }
 
     public function isEmpty(): bool
     {
-        foreach (new Iterator\Keyspace($this->client, $this->queueName . "*", 1) as $tmp) {
-            if($tmp) {
-                return false;
-            }
+        if($this->client->llen($this->queueName) > 0 || $this->client->llen($this->hiddenQueueName) > 0) {
+            return false;
         }
         return true;
     }

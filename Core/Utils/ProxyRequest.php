@@ -35,6 +35,7 @@ class ProxyRequest
             }
         }
         fclose($file);
+        var_dump($this->list);
     }
 
     /**
@@ -140,7 +141,6 @@ class ProxyRequest
         if ($key !== false) {
             unset($this->list[$key]);
         }
-
     }
 
     /**

@@ -71,7 +71,7 @@ class Main
                 $class = $queuedTask->data->type;
                 $task = new $class();
                 $task->process($queuedTask);
-                $this->queue->deleteMessage($queuedTask->id);
+                $this->queue->deleteMessage(json_encode($queuedTask->data));
                 $this->logger->info('Task deleted');
             } catch (NoMessageException $exc) {
                 $this->logger->error($exc->getMessage());
