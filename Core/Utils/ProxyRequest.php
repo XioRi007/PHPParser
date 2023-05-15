@@ -83,7 +83,6 @@ class ProxyRequest
                 echo "$i of $len working\n";
                 $i++;
             } catch (Exception) {
-                echo "$i of $len not working\n";
                 $i++;
             }
         }

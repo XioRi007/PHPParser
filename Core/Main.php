@@ -90,7 +90,7 @@ class Main
     }
 
     /**
-     * Every 10 minutes recheck proxy from the file and fetches from the API
+     * Every 5 minutes recheck proxy from the file and fetches from the API
      * @return  void
      * @throws  GuzzleException
      */
@@ -98,10 +98,11 @@ class Main
     public function proxyWatcher(): void
     {
         while (!$this->queue->isEmpty()) {
-            $this->logger->info('Starting proxy reloading');
+            $this->logger->info('Starting proxy rechecking');
             $this->proxyRequest->recheckProxy();
+            $this->logger->info('Starting proxy reloading');
             $this->proxyRequest->reloadProxies();
-            $this->logger->info('Finished proxy reloading');
+            $this->logger->info('Finished proxy rechecking and reloading');
             sleep(300);
         }
     }
