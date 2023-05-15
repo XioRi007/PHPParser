@@ -59,7 +59,7 @@ class RedisQueue implements IQueue
     public function sendMessage(string $id, array $data): void
     {
         if($this->client->sismember($this->queueName . "_urls", $id) == 1){
-            $this->logger->info("Message $id already exists");
+            //$this->logger->info("Message $id already exists");
             return;
         }
         $this->client->sadd($this->queueName . "_urls", [$id]);

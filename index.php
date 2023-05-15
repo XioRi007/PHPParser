@@ -26,7 +26,7 @@ try {
     //MyDB::migrate();
 //    MyDB::reMigrate();
     $queue = App::getContainer()->make('IQueue');
-    $queue->remake();
+    //$queue->remake();
 
     //you can choose
 //    //$queue->createIfNotExists();

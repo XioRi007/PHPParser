@@ -69,7 +69,7 @@ class ProxyRequest
         $client = new Client([
             'timeout' => 5.0
         ]);
-        $response = $client->request('GET', 'https://api.proxyscrape.com/v2/?request=getproxies&protocol=http&timeout=3000&country=all&ssl=all&anonymity=anonymous');
+        $response = $client->request('GET', 'https://api.proxyscrape.com/v2/?request=getproxies&protocol=http&timeout=5000&country=all&ssl=all&anonymity=anonymous');
         $list = $response->getBody()->getContents();
         $array = explode("\n", $list);
         $file = fopen($filename, "a");
