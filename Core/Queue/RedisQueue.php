@@ -58,7 +58,9 @@ class RedisQueue implements IQueue
     {
         $clearKey = '';
         $res = '';
+        $this->logger->debug("Starting looking for message");
         foreach (new Iterator\Keyspace($this->client, $this->queueName . ":*", 1) as $tmp) {
+            $this->logger->debug("Received message");
             $key = $tmp;
             if ($key == "") {
                 $this->logger->debug("Message is empty");

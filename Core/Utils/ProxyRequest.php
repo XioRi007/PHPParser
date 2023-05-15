@@ -131,6 +131,19 @@ class ProxyRequest
     }
 
     /**
+     * @param  string  $proxy
+     * @return  void
+     */
+    public function deleteProxy(string $proxy): void
+    {
+        $key = array_search($proxy, $this->list);
+        if ($key !== false) {
+            unset($this->list[$key]);
+        }
+
+    }
+
+    /**
      * Sends request using proxy
      * @param string $url
      * @return  string
@@ -143,16 +156,19 @@ class ProxyRequest
             'timeout' => 5.0
         ]);
         $tries = 0;
+        $proxy = "";
         while ($tries < 10) {
             try {
+                $proxy = $this->getRandomProxy();
                 $response = $client->request('GET', $url, [
-                    'proxy' => $this->getRandomProxy(),
+                    'proxy' => $proxy,
                     'headers' => [
                         'User-Agent' => $this->getRandomUserAgent(),
                     ],
                 ]);
                 return $response->getBody()->getContents();
             } catch (Exception $exception) {
+                $this->deleteProxy($proxy);
                 $tries++;
                 if($tries >= 10) {
                     throw $exception;
