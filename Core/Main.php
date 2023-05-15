@@ -7,6 +7,8 @@ namespace Core;
 use Core\Database\MyDB;
 use Core\Queue\Exceptions\NoMessageException;
 use Core\Queue\IQueue;
+use Core\Utils\ProxyRequest;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Monolog\Logger;
 use Throwable;
@@ -29,6 +31,11 @@ class Main
     private int $sleepSec;
 
     /**
+     * @var  ProxyRequest
+     */
+    private ProxyRequest $proxyRequest;
+
+    /**
      * @throws  BindingResolutionException
      */
     public function __construct()
@@ -36,6 +43,7 @@ class Main
         $container = App::getContainer();
         $this->queue = $container->make('IQueue');
         $this->logger = $container->make('Logger');
+        $this->proxyRequest = $container->make('ProxyRequest');
         $this->sleepSec = intval($_ENV['WAIT_SEC']);
     }
 
@@ -79,5 +87,20 @@ class Main
         }
         $this->logger->info('Queue is empty');
         MyDB::close();
+    }
+
+    /**
+     * Every 10 minutes recheck proxy from the file and fetches from the API
+     * @return  void
+     * @throws  GuzzleException
+     */
+
+    public function proxyWatcher(): void
+    {
+        while (!$this->queue->isEmpty()) {
+            $this->proxyRequest->recheckProxy();
+            $this->proxyRequest->reloadProxies();
+            sleep(600);
+        }
     }
 }
