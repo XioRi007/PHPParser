@@ -43,16 +43,16 @@ class RedisQueue implements IQueue
         }
     }
 
-    public function remake(){
+    public function remake(): void
+    {
         foreach (new Iterator\Keyspace($this->client, $this->queueName . ":*", 1) as $tmp) {
-            $t = json_decode($this->client->get($tmp));
-            var_dump($t);
-            $this->sendMessage($t->data->url, $t->data);
+
+            $t = json_decode($this->client->rpop($tmp));
+            $this->sendMessage($t->url, get_object_vars($t));
         }
         foreach (new Iterator\Keyspace($this->client, $this->queueName . "_deleted:*", 1) as $tmp) {
-            $t = json_decode($this->client->get($tmp));
-            var_dump($t);
-            $this->deleteMessage(json_encode($t->data));
+            $t = json_decode($this->client->rpop($tmp));
+            $this->deleteMessage(json_encode($t));
         }
     }
 
