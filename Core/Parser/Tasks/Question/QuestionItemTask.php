@@ -11,7 +11,6 @@ class QuestionItemTask extends BaseTask
 {
     public function process(QueuedTask $task): void
     {
-        $this->logger->info("started QuestionItemTask for {$task->data->url}");
         $document = $this->getDocument($task->data->url);
 
         $questionText = $document->first('#HeaderString')->text();

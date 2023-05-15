@@ -9,7 +9,6 @@ class AnswerItemTask extends BaseTask
 {
     public function process(QueuedTask $task): void
     {
-        $this->logger->info("started AnswerItemTask for {$task->data->url}");
         $document = $this->getDocument($task->data->url);
         $links =  $document->find('.QuestionShort>a');
         $hrefs = $this->extractHrefFromList($links, $task->data->url);

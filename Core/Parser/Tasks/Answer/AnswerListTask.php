@@ -9,7 +9,6 @@ class AnswerListTask extends BaseTask
 {
     public function process(QueuedTask $task): void
     {
-        $this->logger->info("started AnswerListTask for {$task->data->url}");
         $links = $this->getList($task->data->url, '.AnswerShort>a');
         $hrefs = $this->extractHrefFromList($links, $task->data->url);
         $this->logger->debug("AnswerListTask found " . count($hrefs) . " hrefs");

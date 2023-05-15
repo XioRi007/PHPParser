@@ -9,7 +9,6 @@ class QuestionPagesTask extends BaseTask
 {
     public function process(QueuedTask $task): void
     {
-        $this->logger->info("started QuestionPagesTask for {$task->data->url}");
         $links = $this->getList($task->data->url);
         $hrefs = $this->extractHrefFromList($links, $task->data->url);
         $this->logger->debug("QuestionPagesTask found " . count($hrefs) . " hrefs");

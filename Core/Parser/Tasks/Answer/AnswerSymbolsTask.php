@@ -9,7 +9,6 @@ class AnswerSymbolsTask extends BaseTask
 {
     public function process(QueuedTask $task): void
     {
-        $this->logger->info("started AnswerSymbolsTask for {$task->data->url}");
         $links = $this->getList($task->data->url);
         $hrefs = $this->extractHrefFromList($links, $task->data->url);
         $this->logger->debug("AnswerSymbolsTask found " . count($hrefs) . " hrefs");
