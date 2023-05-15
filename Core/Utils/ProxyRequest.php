@@ -17,6 +17,7 @@ class ProxyRequest
 
     public function __construct(string $filename = "Core/Utils/list.txt")
     {
+        $this->list = [];
         $this->readFromFile($filename);
     }
 
@@ -26,7 +27,6 @@ class ProxyRequest
      */
     public function readFromFile(string $filename = "Core/Utils/list.txt"): void
     {
-        $this->list = [];
         $file = fopen($filename, "r");
         while (!feof($file)) {
             $line = fgets($file);
@@ -118,6 +118,7 @@ class ProxyRequest
     public function getRandomProxy(): string
     {
         if(count($this->list) == 0) {
+            var_dump('proxy list is empty');
             $this->reloadProxies();
         }
         return $this->list[array_rand($this->list)];
