@@ -58,23 +58,25 @@ class RedisQueue implements IQueue
     {
         $clearKey = '';
         $res = '';
+//        foreach (new Iterator\Keyspace($this->client, $this->queueName . ":*", 1) as $tmp) {
+//            $this->logger->debug("Received message");
+//            $key = $tmp;
+//            if ($key == "") {
+//                $this->logger->debug("Message is empty");
+//                continue;
+//            }
+//            $clearKey = substr($key, strrpos($key, ':') + 1);
+//            $dest = $this->hiddenQueueName . ":" . $clearKey;
+//            $res = $this->client->rpoplpush($key, $dest);
+//            if ($res == "" || !is_string($res)) {
+//                $this->logger->debug("Message has already been taken");
+//            } else {
+//                break;
+//            }
+//        }
         $this->logger->debug("Starting looking for message");
-        foreach (new Iterator\Keyspace($this->client, $this->queueName . ":*", 1) as $tmp) {
-            $this->logger->debug("Received message");
-            $key = $tmp;
-            if ($key == "") {
-                $this->logger->debug("Message is empty");
-                continue;
-            }
-            $clearKey = substr($key, strrpos($key, ':') + 1);
-            $dest = $this->hiddenQueueName . ":" . $clearKey;
-            $res = $this->client->rpoplpush($key, $dest);
-            if ($res == "" || !is_string($res)) {
-                $this->logger->debug("Message has already been taken");
-            } else {
-                break;
-            }
-        }
+        $res = $this->client->rpoplpush($this->queueName, $this->hiddenQueueName);
+        $this->logger->debug("Received message");
         if($res == "" || !is_string($res)){
             throw new NoMessageException();
         }
