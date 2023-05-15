@@ -98,9 +98,11 @@ class Main
     public function proxyWatcher(): void
     {
         while (!$this->queue->isEmpty()) {
+            $this->logger->info('Starting proxy reloading');
             $this->proxyRequest->recheckProxy();
             $this->proxyRequest->reloadProxies();
-            sleep(600);
+            $this->logger->info('Finished proxy reloading');
+            sleep(300);
         }
     }
 }

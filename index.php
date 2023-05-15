@@ -49,6 +49,22 @@ try {
         exit(0);
     });
 
+    $pid = pcntl_fork();
+    if ($pid == -1) {
+        throw new Exception('Error during the creation of proxy watcher');
+    } elseif ($pid == 0) {
+        try {
+            $logger->critical("Starting proxy watcher");
+            $main = new Main();
+            $main->proxyWatcher();
+        } catch (Exception $exception) {
+            $logger->critical("Error occurred in child process: " . $exception->getMessage());
+        }
+        exit(0);
+    } else {
+        $childProcesses[] = $pid;
+    }
+
     for ($i = 0; $i < $threadsCount; $i++) {
         $pid = pcntl_fork();
         if ($pid == -1) {
@@ -65,20 +81,6 @@ try {
             $childProcesses[] = $pid;
         }
         sleep(3);
-    }
-    $pid = pcntl_fork();
-    if ($pid == -1) {
-        throw new Exception('Error during the creation of subprocess');
-    } elseif ($pid == 0) {
-        try {
-            $main = new Main();
-            $main->proxyWatcher();
-        } catch (Exception $exception) {
-            $logger->critical("Error occurred in child process: " . $exception->getMessage());
-        }
-        exit(0);
-    } else {
-        $childProcesses[] = $pid;
     }
 
     function handleStopSignal($childProcesses, $queue, $logger): void
